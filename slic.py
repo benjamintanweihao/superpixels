@@ -10,10 +10,6 @@ from skimage.util import img_as_float
 from skimage import io
 import matplotlib.pyplot as plt
 
-url = "https://i.imgur.com/Q7xoeiA.png"
-
-
-# url = "https://i.imgur.com/68XbDC7.jpg"
 
 def download_image(url):
     req = Request(url, headers={'User-Agent': 'Mozilla/5.0'})
