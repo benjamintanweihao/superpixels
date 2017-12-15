@@ -1,5 +1,5 @@
 from functools import wraps
-from slic import download_image, get_superpixel_masks
+from slic import download_image, get_superpixel_masks_and_boundaries
 from flask import Flask, request, jsonify, current_app
 from urllib.parse import unquote
 
@@ -38,14 +38,18 @@ def segment():
 
     if url is not None:
         image = download_image(url)
-        masks = get_superpixel_masks(image, n_segs)
+        masks, boundaries = get_superpixel_masks_and_boundaries(image, n_segs)
 
-        pngs_as_text = []
+        masks_as_text = []
 
         for m in masks:
             _, buffer = cv2.imencode('.png', m)
-            png_as_text = str(base64.b64encode(buffer), 'utf-8')
-            pngs_as_text.append(png_as_text)
-            print(png_as_text)
+            mask_as_text = str(base64.b64encode(buffer), 'utf-8')
+            masks_as_text.append(mask_as_text)
+            print(mask_as_text)
 
-        return jsonify({"images": pngs_as_text})
+
+        _, buffer = cv2.imencode('.png', boundaries)
+        boundaries_as_text = str(base64.b64encode(buffer), 'utf-8')
+
+        return jsonify({"masks": masks_as_text, "boundaries": boundaries_as_text})

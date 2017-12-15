@@ -1,4 +1,3 @@
-import base64
 import urllib
 import numpy as np
 import cv2
@@ -7,8 +6,6 @@ from urllib.request import urlopen, Request
 from skimage.segmentation import slic
 from skimage.segmentation import mark_boundaries
 from skimage.util import img_as_float
-from skimage import io
-import matplotlib.pyplot as plt
 
 
 def download_image(url):
@@ -21,13 +18,20 @@ def download_image(url):
         return image
 
 
-def get_superpixel_masks(image, n_segments=100):
-    image = img_as_float(image)
+def get_superpixel_masks_and_boundaries(image, n_segments=100):
+    # TODO: take color in as parameter
+    color = (0, 255, 0)
 
+    image = img_as_float(image)
     segments = slic(image, n_segments=n_segments, sigma=5)
 
-    # cv2.imshow('', mark_boundaries(image, segments))
-    # cv2.waitKey(0)
+    # make empty image to layer boundaries
+    empty = np.zeros(image.shape[:2], dtype=np.uint8)
+    boundaries = mark_boundaries(empty, segments, color=color, outline_color=color)
+
+    # make background transparent
+    boundaries = cv2.cvtColor(np.array(boundaries, dtype=np.uint8), cv2.COLOR_BGR2RGBA)
+    boundaries[np.where((boundaries == [0, 0, 0, 255]).all(axis=2))] = [0, 0, 0, 0]
 
     masks = []
 
@@ -38,6 +42,5 @@ def get_superpixel_masks(image, n_segments=100):
         image[segments != segval] = (0, 0, 0, 0)
 
         masks.append(image)
-        # cv2.imwrite(str(segval) + '.png', image)
 
-    return segments
+    return masks, boundaries
