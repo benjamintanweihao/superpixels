@@ -46,7 +46,6 @@ def segment():
             _, buffer = cv2.imencode('.png', m)
             mask_as_text = str(base64.b64encode(buffer), 'utf-8')
             masks_as_text.append(mask_as_text)
-            print(mask_as_text)
 
 
         _, buffer = cv2.imencode('.png', boundaries)
