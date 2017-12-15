@@ -41,6 +41,6 @@ def get_superpixel_masks_and_boundaries(image, n_segments=100):
         image[segments == segval] = (255, 0, 0, 127)
         image[segments != segval] = (0, 0, 0, 0)
 
-        masks.append(image)
+        masks.append(np.copy(image))
 
     return masks, boundaries
